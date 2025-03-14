@@ -49,12 +49,13 @@ func (m *Session) BodyFatLogByDateRange(startDay string, endDay string) (BodyFat
 }
 
 // AddBodyFat adds a new body weight record
-// date must be in the format yyyy-MM-dd
-func (m *Session) AddBodyFat(day string, fat float64) (BodyFat, error) {
-	contents, err := m.makePOSTRequest("https://api.fitbit.com/1/user/-/body/log/fat.json", map[string]string{
-		"date": day,
-		"fat":  fmt.Sprintf("%f", fat),
-	})
+// date must be either in the format yyyy-MM-dd or yyyy-MM-ddTHH:mm:ss
+func (m *Session) AddBodyFat(date string, fat float64) (BodyFat, error) {
+	params := map[string]string{
+		"fat": fmt.Sprintf("%f", fat),
+	}
+	putDateTimeParam(params, date)
+	contents, err := m.makePOSTRequest("https://api.fitbit.com/1/user/-/body/log/fat.json", params)
 	if err != nil {
 		return BodyFat{}, err
 	}
